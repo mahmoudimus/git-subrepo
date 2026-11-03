@@ -502,6 +502,9 @@ subrepo:clone() {
     o "Remove the old subdir."
     RUN git rm -r -- "$subdir"
 
+    # A reclone records the branch and remote it was given (or the upstream head branch)
+    update_wanted=true
+
     if [[ -z $override_branch ]]; then
       o "Determine the upstream head branch."
       get-upstream-head-branch
@@ -761,7 +764,11 @@ subrepo:fetch() {
 subrepo:branch() {
   local branch=${1:-"subrepo/$subref"}
   o "Check if the '$branch' branch already exists."
-  git:branch-exists "$branch" && return
+  if git:branch-exists "$branch"; then
+    # e.g. left by 'subrepo commit' after a conflicted pull; push cds into it
+    worktree=$GIT_TMP/$branch
+    return
+  fi
 
   local last_gitrepo_commit=
   local first_gitrepo_commit=
