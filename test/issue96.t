@@ -83,12 +83,11 @@ use Test::More
     )" \
         "Subrepo 'sub' pulled from '../sub' ($DEFAULTBRANCH)."
 
-    # Push subrepo changes forecfully (see #530)
+    # Push subrepo changes
     # expected: successful push without conflicts
-    # see: https://github.com/ingydotnet/git-subrepo/issues/530
     is "$(
             cd host
-            git subrepo push --force sub -b "$DEFAULTBRANCH" -u
+            git subrepo push sub -b "$DEFAULTBRANCH" -u
     )" \
        "Subrepo 'sub' pushed to '../sub' ($DEFAULTBRANCH)."
 

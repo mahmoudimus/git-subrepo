@@ -95,7 +95,7 @@ experienced Git users.
 Please note that the commands are /not/ exact equivalents, and do not take all
 the same arguments. Keep reading…
 
-- `git subrepo clone <repository> [<subdir>] [-b <branch>] [-f] [-m <msg>] [-e] [--method <merge|rebase>]`
+- `git subrepo clone <repository> [<subdir>] [-b <branch>] [-f] [-m <msg>] [--file=<msg file>] [-e] [--method <merge|rebase>]`
 
   Add a repository as a subrepo in a subdir of your repository.
 
@@ -117,8 +117,8 @@ the same arguments. Keep reading…
   The `--method` option will decide how the join process between branches are
    performed. The default option is merge.
 
-  The `clone` command accepts the `--branch=` `--edit`, `--force` and
-  `--message=` options.
+  The `clone` command accepts the `--branch=` `--edit`, `--file`, `--force`
+  and `--message=` options.
 
 - `git subrepo init <subdir> [-r <remote>] [-b <branch>] [--method <merge|rebase>]`
 
@@ -133,7 +133,7 @@ the same arguments. Keep reading…
   If you specify the `--remote` (and optionally the `--branch`) option, the
   values will be added to the `<subdir>/.gitrepo` file. The `--remote` option
   is the upstream URL, and the `--branch` option is the upstream branch to push
-  to. These values will be needed to do a `git subrepo push` command, but they
+  to. These values will be needed to do a `git subrepo push` command, but they
   can be provided later on the `push` command (and saved to `<subdir>/.gitrepo`
   if you also specify the `--update` option).
 
@@ -145,7 +145,7 @@ the same arguments. Keep reading…
 
   The `init` command accepts the `--branch=` and `--remote=` options.
 
-- `git subrepo pull <subdir>|--all [-M|-R|-f] [-m <msg>] [-e] [-b <branch>] [-r <remote>] [-u]`
+- `git subrepo pull <subdir>|--all [-M|-R|-f] [-m <msg>] [--file=<msg file>] [-e] [-b <branch>] [-r <remote>] [-u]`
 
   Update the subrepo subdir with the latest upstream changes.
 
@@ -190,10 +190,10 @@ the same arguments. Keep reading…
 
   The set of commands used above are described in detail below.
 
-  The `pull` command accepts the `--all`, `--branch=`, `--edit`, `--force`,
-  `--message=`, `--remote=` and `--update` options.
+  The `pull` command accepts the `--all`, `--branch=`, `--edit`, `--file`,
+  `--force`, `--message=`, `--remote=` and `--update` options.
 
-- `git subrepo push <subdir>|--all [<branch>] [-r <remote>] [-b <branch>] [-M|-R] [-u] [-f] [-s] [-N]`
+- `git subrepo push <subdir>|--all [<branch>] [-m msg] [--file=<msg file>] [-r <remote>] [-b <branch>] [-M|-R] [-u] [-f] [-s] [-N]`
 
   Push a properly merged subrepo branch back upstream.
 
@@ -217,10 +217,11 @@ the same arguments. Keep reading…
   discouraged. Only use this option if you fully understand it. (The `--force`
   option will NOT check for a proper merge. ANY branch will be force pushed!)
 
-  The `push` command accepts the `--all`, `--branch=`, `--dry-run`, `--force`,
-  `--merge`, `--rebase`, `--remote=`, `--squash` and `--update` options.
+  The `push` command accepts the `--all`, `--branch=`, `--dry-run`, `--file`,
+  `--force`, `--merge`, `--message`, `--rebase`, `--remote=`, `--squash` and
+  `--update` options.
 
-- `git subrepo fetch <subdir>|--all [-r <remote>] [-b <branch>]`
+- `git subrepo fetch <subdir>|--force --all [-r <remote>] [-b <branch>]`
 
   Fetch the remote/upstream content for a subrepo.
 
@@ -229,7 +230,7 @@ the same arguments. Keep reading…
   `subrepo/<subdir>`. These are temporary and you can easily remove them with
   the subrepo `clean` command.
 
-  The `fetch` command accepts the `--all`, `--branch=` and `--remote=` options.
+  The `fetch` command accepts the `--force`, `--all`, `--branch=` and `--remote=` options.
 
 - `git subrepo branch <subdir>|--all [-f] [-F]`
 
@@ -244,7 +245,7 @@ the same arguments. Keep reading…
 
   The `branch` command accepts the `--all`, `--fetch` and `--force` options.
 
-- `git subrepo commit <subdir> [<subrepo-ref>] [-m <msg>] [-e] [-f] [-F]`
+- `git subrepo commit <subdir> [<subrepo-ref>] [-m <msg>] [--file=<msg file>] [-e] [-f] [-F]`
 
   Add subrepo branch to current history as a single commit.
 
@@ -257,8 +258,8 @@ the same arguments. Keep reading…
   branch history. That way the same branch can push upstream. Use the
   `--force` option to commit anyway.
 
-  The `commit` command accepts the `--edit`, `--fetch`, `--force` and
-  `--message=` options.
+  The `commit` command accepts the `--edit`, `--fetch`, `--file`, `--force`
+  and `--message=` options.
 
 - `git subrepo status [<subdir>|--all|--ALL] [-F] [-q|-v]`
 
@@ -374,6 +375,10 @@ the same arguments. Keep reading…
 - `--fetch` (`-F`)
 
   Use this option to fetch the upstream commits, before running the command.
+
+- `--file=<commit msg file>`
+
+  Supply your own commit message from a file
 
 - `--force` (`-f`)
 
@@ -579,7 +584,7 @@ is called:
 
 = Status
 
-The git-subrepo command has been in use for well over a year and seems to get
+The git-subrepo command has been used in production and seems to get
 the job done. Development is still ongoing but mostly just for fixing bugs.
 
 Trying subrepo out is simple and painless (this is not `git submodule`).
@@ -601,6 +606,73 @@ If you want to chat about the `git-subrepo` command, join `#gitcommands` on
 * Written in (very modern) Bash, with full test suite. Take a look.
 * A `.gitrepo` file never is in the top level dir (next to a `.git/` dir).
 
+= Working with nested subrepos
+
+`git-subrepo` supports adding subrepos which themselves make use of
+subrepos. In fact, subrepo itself is built this way. Take a look in the
+`ext/` folder, it houses 2 dependencies as subrepos, `test-more-bash` and
+`bashplus`.
+
+`test-more-bash` itself depends on 2 more subrepos: `bashplus` again, and
+`test-tap-bash`.
+
+The structure is therefore as follows:
+
+  git-subrepo
+    |- bashplus
+    |- test-more-bash
+      |- bashplus
+      |- test-tap-bash
+
+However, it's important to understand how this works. Here's the key idea:
+There is *no* special handling for nested subrepos.
+
+When you clone a subrepo, *all* `git-subrepo` does is download the code
+and set up the subrepo file.
+This means that all the subrepo commands simply act on the subrepo as a whole,
+treating nested subrepos like any other part of the source code.
+
+Let's look at what this means in practice. Say you have a structure as follows:
+
+  app-foo
+    |- barlib
+       |- bazlib
+
+You're working on app-foo, and make some changes to bazlib. How should you
+upstream these changes?
+
+From the perspective of app-foo, you've simply made some changes to barlib.
+Whether or not those changes were themselves in a subrepo is irrelevant. So,
+just like any other changes, you run
+
+`git subrepo push barlib`
+
+Now, if `barlib` is a library you don't maintain, your responsibility would end
+here. `barlib`'s maintainer would see your changes and decide what to do with
+them.
+
+If you do maintain `barlib`, you might now want to upstream the changes all the
+way into `bazlib`. You could be tempted to try running something like:
+
+`git subrepo push barlib/bazlib`
+
+but you'll soon find out that doesn't work.
+`app-foo` doesn't know anything about the link between `barlib` and `bazlib`.
+
+What you should do is treat the changes to `barlib` as if they would come from
+another contributor, aka:
+
+* go to a local copy of `barlib`
+* pull down the changes with `git pull`
+* you notice the changes include some work on your subrepo, time to upstream
+  them:
+  `git subrepo push bazlib`
+
+And you're done! One final step you'll likely want to do is to go back to
+`app-foo` and run `git subrepo pull barlib`, because the push you just did added
+a new commit.
+
+
 = Authors
 
 * Ingy döt Net <ingy@ingy.net>
@@ -611,4 +683,4 @@ If you want to chat about the `git-subrepo` command, join `#gitcommands` on
 
 The MIT License (MIT)
 
-Copyright (c) 2013-2020 Ingy döt Net
+Copyright (c) 2013-2024 Ingy döt Net
