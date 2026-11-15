@@ -8,7 +8,7 @@
 >
 > It's also built on `git filter-branch`, which git itself now warns against using, plus temporary worktrees that can be left behind and block the next command (`There is already a worktree with branch subrepo/...`).
 >
-> A blog post on moving from git-subrepo to Copybara is coming soon on [mahmoudimus.com](https://mahmoudimus.com).
+> More on the move from git-subrepo to Copybara: [Retiring my git-subrepo fork for Copybara](https://mahmoudimus.com/blog/2026/11/retiring-my-git-subrepo-fork-for-copybara/).
 
 If you still want git-subrepo, this fork is current with [ingydotnet/git-subrepo](https://github.com/ingydotnet/git-subrepo) `master` as of 2026-02-05 (`5e0f401`, version 0.4.9) and passes all 360 tests in the project's suite. The full documentation is in [ReadMe.pod](ReadMe.pod).
 
