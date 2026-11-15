@@ -17,7 +17,7 @@ while (( "$#" )); do
   case "$1" in
     .|..|./*|../*)
       # if an argument starts with "./" or "../": Make it relative to git root
-      ARGS+=( "$(realpath --relative-to=$GIT_ROOT -m $1)" )
+      ARGS+=( "$(realpath --relative-to="$GIT_ROOT" -m "$1")" )
       shift
       ;;
     *)
@@ -29,8 +29,7 @@ while (( "$#" )); do
 done
 
 (
-	echo -e "\e[97mRunning: cd $GIT_ROOT && git subrepo ${ARGS[@]}\e[39m"
-	cd $GIT_ROOT
-	git subrepo ${ARGS[@]}
+	echo -e "\e[97mRunning: cd $GIT_ROOT && git subrepo ${ARGS[*]}\e[39m"
+	cd "$GIT_ROOT" || exit
+	git subrepo "${ARGS[@]}"
 )
-

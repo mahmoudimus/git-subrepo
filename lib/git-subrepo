@@ -898,7 +898,7 @@ subrepo:branch() {
 
   # Mechanism to skip subdirs containing subrepos during a push.
   # TODO: 1) mention dependency on 'find'; 2) may be turned on/off on option.
-  if [[ $(hash find) -eq 0 ]]; then 
+  if [[ $(hash find) -eq 0 ]]; then
     o "Checking $subdir for nested subdirs to avoid"
     local subdirs
     mapfile -t subdirs < <(cd -- "$subdir"; find . -mindepth 1 -type d -exec 'test' '-f' '{}/.gitrepo' ';' -print)
@@ -1835,7 +1835,7 @@ shown in the output above.
 
 This is the common conflict resolution workflow:
 
-  1. cd $(realpath . --relative-to $OLDPWD)
+  1. cd "$(realpath . --relative-to "$OLDPWD")"
      alternatively: git-cola -r $(realpath .)
   2. Resolve the conflicts (see "git status").
   3. "git add" the resolved files.

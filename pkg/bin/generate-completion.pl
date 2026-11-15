@@ -260,9 +260,16 @@ _git_subrepo() {
         local subdircommand
         subdircommand="\$(__git_find_on_cmdline "\$subdircommands")"
         if [ -n "\$subdircommand" ]; then
-            local git_subrepos
-            git_subrepos=$(git subrepo status -q)
-            __gitcomp "\$git_subrepos"
+            # Complete subrepo paths relative to the current directory.
+            # macOS realpath has no --relative-to; use GNU grealpath if present.
+            local git_root git_subrepos subrepo relative=() rp=realpath
+            command -v grealpath >/dev/null && rp=grealpath
+            git_root=\$(git rev-parse --show-toplevel) || return
+            git_subrepos=\$(cd "\$git_root" && git subrepo status -q) || return
+            for subrepo in \$git_subrepos; do
+                relative+=("\$("\$rp" --relative-to="\$PWD" -m "\$git_root/\$subrepo" 2>/dev/null || echo "\$subrepo")")
+            done
+            __gitcomp "\${relative[*]}"
         fi
 
     fi

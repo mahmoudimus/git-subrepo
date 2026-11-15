@@ -17,5 +17,6 @@ repos:
         args: [-x]
         exclude: |
              (?x)^(ext/.*|
-                 share/git-completion.bash
+                 share/git-completion.bash|
+                 share/zsh-completion/git-completion.bash
              )$
